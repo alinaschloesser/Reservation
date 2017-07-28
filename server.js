@@ -29,14 +29,14 @@ var tables = [{
     },
     {
         routeName: "alina",
-        name: "Alina Maria",
+        name: "Alina Morrill",
         phoneNumber: "760-123-4567",
         email: "alina@outlook.com",
         uniqueID: 333
     }
 ];
 
-var waitList = [{
+var waitlist = [{
     routeName: "thomas",
     name: "Thomas",
     phoneNumber: "972-333-3333",
@@ -49,15 +49,15 @@ var waitList = [{
 
 // Basic route that sends the user first to the AJAX Page
 app.get("/", function(req, res) {
-    res.sendFile(path.join(__dirname, "index.html"));
+    res.sendFile(path.join(__dirname, "/app/display/index.html"));
 });
 
 app.get("/reserve", function(req, res) {
-    res.sendFile(path.join(__dirname, "reserve.html"));
+    res.sendFile(path.join(__dirname, "/app/display/reserve.html"));
 });
 
 app.get("/tables", function(req, res) {
-    res.sendFile(path.join(__dirname, "tables.html"));
+    res.sendFile(path.join(__dirname, "/app/display/tables.html"));
 });
 
 // Get all characters
@@ -66,49 +66,62 @@ app.get("/tables", function(req, res) {
 // });
 
 // Search for Specific Character (or all characters) - provides JSON
-app.get("/api/:tables?", function(req, res) {
-    var chosen = req.params.tables;
+app.get("/api/:action?", function(req, res) {
+    var action = req.params.action;
 
-    if (chosen) {
-        console.log(chosen);
+    switch (action) {
+        case 'tables':
+            res.json(tables);
+            break;
+        case 'waitlist':
+            res.json(waitlist);
+            break;
 
-        for (var i = 0; i < tables.length; i++) {
-            if (chosen === tables[i].routeName) {
-                return res.json(tables[i]);
-            }
-        }
-        return res.json(false);
     }
-    return res.json(tables);
+
+    // if (chosen) {
+    //     console.log(chosen);
+
+    //     for (var i = 0; i < tables.length; i++) {
+    //         if (chosen === tables[i].routeName) {
+    //             return res.json(tables[i]);
+    //         }
+    //     }
+    //     return res.json(false);
+    // }
+    return;
 });
+// app.get("/api/waitlist", function(req, res) {
 
-app.get("/api/:waitList?", function(req, res) {
-    var chosen = req.params.waitList;
+//     // if (chosen) {
+//     //     console.log(chosen);
 
-    if (chosen) {
-        console.log(chosen);
-
-        for (var i = 0; i < waitList.length; i++) {
-            if (chosen === waitList[i].routeName) {
-                return res.json(waitList[i]);
-            }
-        }
-        return res.json(false);
-    }
-    return res.json(tables);
-});
-
-// Create New Characters - takes in JSON input
+//     //     for (var i = 0; i < waitlist.length; i++) {
+//     //         if (chosen === waitlist[i].routeName) {
+//     //             return res.json(waitlist[i]);
+//     //         }
+//     //     }
+//     //     return res.json(false);
+//     // }
+//     return res.json(waitlist);
+// });// Create New Characters - takes in JSON input
 app.post("/api/new", function(req, res) {
-    var newcharacter = req.body;
-    newcharacter.routeName = newcharacter.name.replace(/\s+/g, "").toLowerCase();
+    var newReservation = req.body;
+    newReservation.routeName = newReservation.name.replace(/\s+/g, "").toLowerCase();
 
-    console.log(newcharacter);
+    console.log(newReservation);
 
-    characters.push(newcharacter);
+    if (tables.length < 5) {
+        tables.push(newReservation);
 
-    res.json(newcharacter);
+    } else {
+        waitlist.push(newReservation);
+    }
+
+    res.json(newReservation);
 });
+
+
 
 app.listen(process.env.PORT || PORT, function() {
     console.log("App listening on PORT " + PORT);
